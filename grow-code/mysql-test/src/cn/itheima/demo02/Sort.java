@@ -1,0 +1,65 @@
+package cn.itheima.demo02;
+
+/*
+    将数据表中的sort内容添加到Sort类中,并用集合封装ArrayList<Sort>
+ */
+public class Sort {
+    private int sid;
+    private String sname;
+    private double sprice;
+    private String sdesc;
+
+    public int getSid() {
+        return sid;
+    }
+
+    public void setSid(int sid) {
+        this.sid = sid;
+    }
+
+    public String getSname() {
+        return sname;
+    }
+
+    public void setSname(String sname) {
+        this.sname = sname;
+    }
+
+    public double getSprice() {
+        return sprice;
+    }
+
+    public void setSprice(double sprice) {
+        this.sprice = sprice;
+    }
+
+    public String getSdesc() {
+        return sdesc;
+    }
+
+    public void setSdesc(String sdesc) {
+        this.sdesc = sdesc;
+    }
+
+    public Sort(int sid, String sname, double sprice, String sdesc) {
+
+        this.sid = sid;
+        this.sname = sname;
+        this.sprice = sprice;
+        this.sdesc = sdesc;
+    }
+
+    public Sort() {
+
+    }
+
+    @Override
+    public String toString() {
+        return "Sort{" +
+                "sid=" + sid +
+                ", sname='" + sname + '\'' +
+                ", sprice=" + sprice +
+                ", sdesc='" + sdesc + '\'' +
+                '}';
+    }
+}

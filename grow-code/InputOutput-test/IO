@@ -1,0 +1,322 @@
+Input:输入
+Output:输出
+IO第一天:
+File类:文件和目录路经名的抽象表现形式
+    将操作系统中的文件/目录(文件夹)/路经封装成了File对象,并且具备与系统无关的特性.
+        文件:file
+        目录:directory
+        路经:path
+
+File类的构造方法:
+    File(String pathname): 将指定路径名字的字符串转换为抽象路径名来创建一个新File实例
+
+    File(String parent,String child): 传递字符串父路径,字符串子路径.
+        好处:单独操作父路径和子路径,更加灵活
+    File(File parent,String child): 传递File类型父路径,字符串子路径.
+        好处:父路径是File类型的,可以单独直接调用File方法.
+
+绝对路径:在系统中具有唯一性
+相对路径:表示的是路经之间的相对关系   存在父目录及子目录,父目录是唯一的,子目录可以有多个
+
+File类下的常用方法:
+    .pathSeparator  //路经分隔符:  ;
+    .separator  //名称分隔符:   \
+    ------------------------------------
+    创建功能:
+        .createNewFile() //创建的文件路径名和文件名,在File构造方法,返回值为boolean,创建成功或失败,只能创建文件
+        .mkdirs()  //创建文件夹的方法.并且可以多级创建,返回值为boolean
+        .delete()  //删除方法,返回值一样为boolean
+    获取功能:
+        .getName()  //返回路径中表示的文件夹名或者文件,获取路径中最后部分的名字
+        .getPath()  //获取的路经全名称
+        .length()   //返回路径中表示的文件和字节数大小,返回值为long型
+        .getAbsolutePath()
+        .getAbsolutePath()// 这两个方法类似,上面返回String类型,这个返回File类型,都是获取绝对路径
+        .getParentPath() //获取父路径,返回File类型
+    判断功能:
+        .exists()  // 判断File构造方法中封装的路经是否存在,返回值:boolean
+        .isDirectory()  //判断File构造方法中封装的路经是不是文件夹,返回值:boolean
+        .isFile  //判断是不是文件,和上面是相反的,不是文件夹就是文件
+    获取功能:
+        String[] strArr = file.list();  //都是遍历路径下的所有文件,返回值为一个String类型的数组
+        File[] fileArr = file.listFiles();  // 同样,只是返回值为File类型的数组
+        File[] fileArr = file.listRoot();  //获取地址之中的所有根目录.
+-----------------------------------------------------------------------------------------------
+过滤器:
+FileFilter接口.需要实现重写,自定义
+    @Override
+    public boolean accept(File pathname) {
+        return pathname.getName().endsWith(".txt");
+    }
+
+遍历指定目录下所有的文件,如果有子文件夹,继续遍历子文件夹下的文件:
+    public static void getAllDirs(File pathname){
+        File[] files = pathname.listFiles();
+        for (File file : files) {
+            if(file.isDirectory()){
+                getAllDirs(file);    //递归思想
+            }else{
+                System.out.println(file);
+            }
+        }
+    }
+☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+递归思想:适合于方法中运算的主体不变,但是运行的时候,参与运行的方法参数在变化
+    分两种情况:直接递归和间接递归
+        直接递归:方法本身调用自己
+        间接递归:A方法调用B方法,B方法调用C方法,C方法调用A方法,间接要注意死循环问题
+    注意事项:
+        递归一定要有出口,必须让程序运行到一定时候可以停下来.否则成为死循环,堆内存会溢出
+        递归次数不宜过多
+        构造方法禁止调用递归
+☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+==========================================================================================
+IO第二天:
+字节流,字节输入流(InputStream)/字节输出流(OutputStream)
+    从程序到文件是输出
+    从文件到程序是输入
+
+OutputStream,字节输出流,是一个抽象类,是所有输出字节流的类的超类
+    作用:从java程序中写出文件
+    字节:这样的流每次只操作文件中1个字节
+    只能操作文件,并且写任意文件
+    流对象,操作文件的时候,是依赖于操作系统.
+
+【long s = System.currentTimeMillis   //放在开头和结尾可以用来检测时间】
+【文本当中,一个数字就是一个字节,但是一个文字对应的是两个字节】
+
+FileOutputStream:写入数据文件,继承父类,使用子类对象(OutPutStream的一个子类)
+    子类中的构造方法,主要是绑定输出的输出目的
+        参数: File --- 封装文件;  String ---字符串的文件名
+
+流对象使用步骤:
+    1,创建流子类对象,绑定数据目的
+    2,调用流对象的方法write方法
+    3,释放资源
+
+写入文件的方法:
+    write(int)  //写一个字节
+    write(byte[]) //写字节数组
+    write(byte[] ,int,int)  //写字节数组,开始索引然后写几个
+    简便方法:写入字符串
+    write("String".getBytes());
+
+IO当中的异常处理:
+    public static void main(String[] args) {
+        FileOutputStream fos = null;
+        try{
+            fos = new FileOutputStream("d:\\test\\b.txt");
+            fos.write("HelloWorld".getBytes());
+        }catch(IOException ex){
+            System.out.println(ex);
+            throw new RuntimeException("写入失败");
+        }finally {
+            try{
+                if(fos!=null)
+                    fos.close();
+            }catch(IOException ex){
+                throw new RuntimeException("关闭资源失败");
+            }
+        }
+    }
+--------------------------------------------------------------------------------------------
+InputStream:字节输入流,是一个抽象类,是所有字节输入流的类的超类
+    读取任意文件,每次只读一个字节
+    读取的方法:
+        int  read()  //读取一个字节
+        int  read(byte[] b)   //读取一定量的字节,存储到数组中
+
+FileInputStream类,InputStream的一个子类
+    read() 方法的特点:
+        1,调用一次,read()就往后读一次,返回值为int类型,一次只读一个字节
+        2,当读取到结尾的时候,返回值为-1;
+
+    read(byte[]):
+        1,里面写一个字节数组,一次读取一个字节数组的长度,能够提升效率
+        参考:
+            FileInputStream fis = new FileInputStream("d:\\test\\c.txt");
+            byte[] bytes = new byte[2];   //一次读取两个字节,存储到字节数组当中
+            int len = 0;
+            while ((len=fis.read(bytes))!=-1){
+                System.out.print(new String(bytes,0,len));
+            }
+
+文件复制的原理,复制任何文件都是可以的:
+    public static void copyMethod01(FileInputStream fis, FileOutputStream fos) {
+        try {
+            fis = new FileInputStream("d:\\test\\c.txt");  //读取数据源的内容
+            fos = new FileOutputStream("d:\\test\\test01\\c.txt");  //写入
+            int len = 0;
+            while ((len = fis.read()) != -1) {
+                fos.write(len);
+            }
+        } catch (IOException ex) {
+            System.out.println(ex);
+            throw new RuntimeException("复制失败");
+        } finally {
+            try {
+                if (fos != null)
+                    fos.close();
+            } catch (IOException ex) {
+                throw new RuntimeException("关闭fos失败");
+            } finally {
+                try {
+                    if (fis != null)
+                        fis.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException("关闭fis失败");
+                }
+            }
+        }
+    }
+-------------------------------------------------------------------------------
+Writer 字符输出流
+    java.io.Writer  所有字符输出流的超类
+    只能用来写文本文件
+
+    注意:字符输出流写数据的时候,必须运行一个功能,刷新的功能
+        flush() --- 刷新的方法
+
+FileWriter 是Writer的一个子类
+    1,写一个字符数组
+        FileWriter fw = new FileWriter("数据源目的");
+        char[] c = {'a','b','c','d','e','f'};
+        fw.write(c);
+        fw.flush();  //刷新
+    2,写字符数组的一部分
+        char[] c = {'a','b','c','d','e','f'};
+        fw.write(c,2,2);  // 字符数组,起始位置,写几个
+        fw.flush();
+    3,写一个字符串
+        fw.writer("hello");
+        fw.flush();
+--------------------------------------------------------------------------
+Reader 字符输入流
+    java.io.Reader  所有字符输入流的超类
+    专门并且只能用来读取文本文件
+
+FileReadr 一个Reader的子类
+    当中的read读取方法和字节输入流的read方法十分类似,就是字节byte数组换成char[]
+    需要注意的是字符输入流,只有读取字符和字符数组的方法,没有读取字符串的方法.原因是字符串的定义太广泛了.
+
+
+========================================================================================================================
+IO第三天
+    转换流分为两个:
+        java.io.OutputStreamWriter  继承Write类
+            字符流通向字节流的桥梁,可以将字符流转换成字节流去使用
+            构造方法:
+                OutputStreamWriter(OutputStream)  //接受字节输出流
+                OutputStreamWriter(OutputStream,String charsetName)   //接受字节输出流和编码表的名字
+        java.io.InputStreamReader   继承Reader类
+            字节流通向字符流的桥梁,可以将字节流转换成字符流去使用
+            构造方法:
+                InputStreamWriter(InputStream)    //接受字节输入流
+                InputStreamWriter(InputStream,String charsetName)     //接受字节输入流和编码表的名字
+
+    缓冲流:提高性能
+        BufferedInputStream
+        BufferedOutputStream
+        BufferedReader
+        BufferedWriter
+
+
+
+☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+IO第三天的总结
+    流的操作规律:
+        文件内容的处理无非就是读和写两种,当需要读和写的时候就需要用到IO操作
+        注意:IO操作都是操作在文件上,而不是文件夹!
+        明确一:要操作的数据是数据源还是数据目的
+            源:InputStream       Reader  输入
+            目的:OutputStream    Writer  输出
+            先根据需求明确要读还是要写
+        明确二:要操作的数据是字节还是文本(文本文件是打开之后人能够看得懂的,打开之后看不懂的就是非文本文件也就是字节文件)
+            源:
+                字节:InputStream
+                文本:Reader
+            目的:
+                字节:OutputStream
+                文本:Writer
+        明确三:明确数据所在的设备
+            源设备:
+                硬盘:文件,File开头
+                内存:数组,字符串
+                键盘:System.in
+                网络:Socket(网络中的套接字,电脑与电脑之间的交互,很重要!)
+            目的设备:
+                硬盘:文件,File开头
+                内存:数组,字符串
+                屏幕:System.out
+                网络:Socket(网络中的套接字,能够实现电脑与电脑之间使用IO进行交互,很重要!)
+        明确四:是否需要额外功能
+            额外功能:
+                转换吗? 转换流:InputStreamReader/OutputStreamWriter
+                高效吗? 缓冲流:BufferedXXX
+
+========================================================================================================================
+IO第四天:
+Properties类:
+    特点:(最大的特点就是可以和IO对象结合使用,实现数据的持久化存储)
+        1,继承HashTable,实现Map接口
+        2,该集合没有泛型,键值都是字符串
+        3,它是一个可以持久存储的集合,键值可以存储到集合中,也可以储存到持久化的设备(硬盘,U盘...)当中,键值的来源也可以
+        是持久化设备
+        4,有和流技术相结合的方法
+            .load(InputStream/Reader):把指定流所对应的文件中的数据读取出来,然后保存到Properties集合中
+            .store(OutputStream/Writer,Commonts):把集合中的数据,保存到指定的流所对应的文件中,参数Commonts代表描述信息.
+    使用:
+        setProperty()方法等同于Map接口中的put方法
+        setProperty(String key,String value),键值都为String类型
+        通过键获取值,使用 .getProperty(String key)
+        .stringPropertyNames(),将集合中的键存储到Set集合当中,等同于Map集合中的keySet方法
+        .load()是Properties集合特有的方法
+        .store():接受所有的字节或者字符的输出流,将集合中的键值对,写回文件中保存
+---------------------------------------------------------------------------------------------------------------------
+序列化与反序列化:
+    用于从流中读取对象的操作流,将文件对象读取出来   ObjectInputStream 反序列化
+    用于向流中写入对象的操作流,将对象写到文件中   ObjectOutputStream 序列化
+对象的序列化:对象中的数据,以流的形式写入到文件中保存的过程称为写出对象,也就是对象的序列化
+对象的反序列化:在文件中,以流的形式,将对象读取出来称为对象的反序列化
+
+☆☆特点:用于操作对象,可以将对象写入到文件,也可以从文件当中读取对象,用于读写对象!
+
+    注意事项:
+        1,当一个对象需要启用序列化的时候,要实现一个接口:Serializable(标记性接口)
+        2,静态修饰的成员变量不能序列化,原因static修饰的成员不属于对象,是属于类的!
+        如果想要对象当中的属性不被序列化可以再属性前面加上一个关键字:transient(阻止成员变量序列化,并且只能用于成员变量)
+
+------------------------------------------------------------------------------------------------------------------------
+打印流:
+    PrintStream
+    PrintWriter(常用,原因灵活性,使用价值相较于字节会高一些)
+    特点:
+        1,此流不负责数据源,只负责数据目的
+        2,为其他输出流添加功能
+        3,永远不能被抛出IOException,但是可能会抛出别的异常
+
+    这两个打印流的方法完全一致,区别只在于构造方法不同.
+        构造方法,就是打印流的输出目的端
+    PrintStream
+        构造方法,接受File类型,接受字符串文件名,接受字节输出流OutputStream
+    PrintWriter
+        构造方法,接受File类型,接受字符串文件名,接受字节输出流OutputStream,同时也接受字符输出流Writer
+
+    【【所有的println方法当中,只有一个方法带数组,就是char!】】
+
+    打印流，可以启动自动刷新功能：
+        满足两个条件：
+            1，输出的数据目的必须是流对象
+                OutputStream  Writer
+            2, 必须调用,println/printf/format三个方法中的一个,才能够启用自动刷新
+
+
+
+
+
+
+
+
+
+
+
