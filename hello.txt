@@ -1,1 +1,2 @@
 Hello Git!
+git init -----初始化,创建本地仓库
